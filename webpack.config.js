@@ -3,10 +3,13 @@ let path = require("path");
 let BundleTracker = require('webpack-bundle-tracker');
 let ExtractTextPlugin = require('extract-text-webpack-plugin');
 let LiveReloadPlugin = require('webpack-livereload-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
   mode: 'development',
   context: __dirname,
+  devtool: 'source-map',
+  watch: true,
 
   entry: {
     main: ['./app/static/app/js/main.jsx'],
@@ -29,7 +32,8 @@ module.exports = {
     }),
     new webpack.ProvidePlugin({
         THREE: path.join(__dirname, './app/static/app/js/vendor/potree/three')
-    })
+    }),
+    new CleanWebpackPlugin(),
   ],
 
   module: {

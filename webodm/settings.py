@@ -127,7 +127,7 @@ DATABASES = {
         'NAME': 'webodm_dev',
         'USER': 'postgres',
         'PASSWORD': 'postgres',
-        'HOST': 'db',
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }

@@ -480,4 +480,5 @@ These steps are for Google Cloud, but can also be used for Amazon AWS, and other
 
 To setup the firewall on Google Cloud, open the instance, on the middle of the instance settings page find NIC0. Open it, and then add the TCP Port 8000 for ingress, and egress on the Firewall.
 
-
+## How to read on host
+https://app.gitbook.com/@liuyongjie9313/s/webodm-3d/webodm-install-on-mac
