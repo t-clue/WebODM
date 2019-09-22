@@ -440,3 +440,17 @@ class TaskAssetsImport(APIView):
 
         serializer = TaskSerializer(task)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+from django.views.decorators.csrf import csrf_exempt
+"""
+for saving shot point of viewfile
+"""
+@csrf_exempt
+def saveShotPointOfView(request):
+    with open(models.Setting.filename_pointOfView, 'w+') as f:
+        f.write('longitude: %s '%request.POST['longitude'])
+        f.write('latitude: %s '%request.POST['latitude'])
+        f.write('altitude: %s '%request.POST['altitude'])
+        f.write('\n')
+        f.write(request.POST)
+    return Response({'success': True})

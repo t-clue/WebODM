@@ -31,6 +31,7 @@ class Setting(models.Model):
     organization_website = models.URLField(default='https://github.com/OpenDroneMap/WebODM/', max_length=255, blank=True, null=True, help_text="The website URL of your organization")
     theme = models.ForeignKey(Theme, blank=False, null=False, on_delete=models.DO_NOTHING,
                               help_text="Active theme")
+    filename_pointOfView = "pointOfView.txt"
 
     def __init__(self, *args, **kwargs):
         super(Setting, self).__init__(*args, **kwargs)

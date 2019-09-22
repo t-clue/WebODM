@@ -6,8 +6,10 @@ let path = require("path");
 let ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 module.exports = {
-  mode: 'production',
+  mode: 'development',
   context: __dirname,
+  devtool: 'source-map',
+  watch: true,
 
   entry: ${entry_json},
 

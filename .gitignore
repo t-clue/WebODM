@@ -1,5 +1,11 @@
+# temp file 
+pointOfView.txt
+celerybeat-schedule.db
+dump.rdb
+
 # vscode 
 ./vscode
+.vscode
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

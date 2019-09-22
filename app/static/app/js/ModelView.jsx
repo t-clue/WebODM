@@ -7,6 +7,7 @@ import Standby from './components/Standby';
 import ShareButton from './components/ShareButton';
 import PropTypes from 'prop-types';
 import $ from 'jquery';
+import CollectPointOfViewButton from './components/CollectPointOfViewButton';
 
 window.Potree = require('./vendor/potree');
 require('./vendor/OBJLoader');
@@ -245,6 +246,11 @@ class ModelView extends React.Component {
 
           <div className="model-action-buttons">
             <AssetDownloadButtons 
+                            task={this.props.task} 
+                            direction="up" 
+                            showLabel={false}
+                            buttonClass="btn-secondary" />
+            <CollectPointOfViewButton
                             task={this.props.task} 
                             direction="up" 
                             showLabel={false}
