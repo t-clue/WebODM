@@ -7,7 +7,7 @@ import Standby from './components/Standby';
 import ShareButton from './components/ShareButton';
 import PropTypes from 'prop-types';
 import $ from 'jquery';
-import CollectPointOfViewButton from './components/CollectPointOfViewButton';
+import proj4 from 'proj4';
 
 window.Potree = require('./vendor/potree');
 require('./vendor/OBJLoader');
@@ -40,6 +40,27 @@ class TexturedModelMenu extends React.Component{
     }
 }
 
+class CollectPointOfViewButton extends React.Component {
+  static propTypes = {
+    collectShot: PropTypes.func.isRequired
+  }
+
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
+  shoot = () => {
+    this.props.collectShot();
+  }
+
+  render() {
+    return (
+      < button onClick={this.shoot} > shot</button >
+    );
+  }
+}
+
 class ModelView extends React.Component {
   static defaultProps = {
     task: null,
@@ -64,6 +85,7 @@ class ModelView extends React.Component {
     this.modelReference = null;
 
     this.toggleTexturedModel = this.toggleTexturedModel.bind(this);
+    this.collectShot = this.collectShot.bind(this);
   }
 
   assetsPath(){
@@ -170,6 +192,21 @@ class ModelView extends React.Component {
     }
   }
 
+  collectShot() {
+    let url = "/api/projects/savePOV";
+    var request = new XMLHttpRequest();
+    request.open("POST", url);
+    var data = new FormData();
+
+    var camera = window.viewer.scene.getActiveCamera();
+    var position = camera.position;
+
+    data.append('x', position.x);
+    data.append('y', position.y);
+    data.append('z', position.z);
+    request.send(data);
+  }
+
   toggleTexturedModel(e){
     const value = e.target.checked;
 
@@ -250,11 +287,9 @@ class ModelView extends React.Component {
                             direction="up" 
                             showLabel={false}
                             buttonClass="btn-secondary" />
-            <CollectPointOfViewButton
-                            task={this.props.task} 
-                            direction="up" 
-                            showLabel={false}
-                            buttonClass="btn-secondary" />
+            <CollectPointOfViewButton 
+                          collectShot={this.collectShot.bind(this)
+                          }> </CollectPointOfViewButton> 
             {(!this.props.public) ? 
             <ShareButton 
                 ref={(ref) => { this.shareButton = ref; }}

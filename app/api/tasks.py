@@ -447,10 +447,9 @@ for saving shot point of viewfile
 """
 @csrf_exempt
 def saveShotPointOfView(request):
-    with open(models.Setting.filename_pointOfView, 'w+') as f:
-        f.write('longitude: %s '%request.POST['longitude'])
-        f.write('latitude: %s '%request.POST['latitude'])
-        f.write('altitude: %s '%request.POST['altitude'])
+    with open(models.Setting.filename_pointOfView, 'a+') as f:
+        f.write('x: %s '%request.POST['x'])
+        f.write('y: %s '%request.POST['y'])
+        f.write('z: %s '%request.POST['z'])
         f.write('\n')
-        f.write(request.POST)
     return Response({'success': True})
