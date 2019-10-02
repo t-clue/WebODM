@@ -30,7 +30,10 @@ export class MapView{
 		this.toolLayer = null;
 		this.sourcesLayer = null;
 		this.sourcesLabelLayer = null;
-		this.enabled = false;
+		this.enabled = true;
+
+		this.mercatorX = 0 
+		this.mercatorY = 0
 
 		this.createAnnotationStyle = (text) => {
 			return [
@@ -674,7 +677,7 @@ export class MapView{
 	toggle () {
 		if (this.elMap.is(':visible')) {
 			this.elMap.css('display', 'none');
-			this.enabled = false;
+			this.enabled = true;
 		} else {
 			this.elMap.css('display', 'block');
 			this.enabled = true;
@@ -709,6 +712,10 @@ export class MapView{
 		let geoPos = camera.position;
 		let geoLookAt = sceneLookAt;
 		let mapPos = new THREE.Vector2().fromArray(this.toMap.forward([geoPos.x, geoPos.y]));
+
+		this.mercatorX = mapPos.x
+		this.mercatorY = mapPos.y
+
 		let mapLookAt = new THREE.Vector2().fromArray(this.toMap.forward([geoLookAt.x, geoLookAt.y]));
 		let mapDir = new THREE.Vector2().subVectors(mapLookAt, mapPos).normalize();
 

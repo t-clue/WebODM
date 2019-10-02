@@ -204,6 +204,9 @@ class ModelView extends React.Component {
     data.append('x', position.x);
     data.append('y', position.y);
     data.append('z', position.z);
+
+    data.append('mx', window.viewer.mapView.mercatorX)
+    data.append('my', window.viewer.mapView.mercatorY)
     request.send(data);
   }
 

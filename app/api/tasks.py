@@ -442,6 +442,15 @@ class TaskAssetsImport(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 from django.views.decorators.csrf import csrf_exempt
+
+
+import math
+def webMercator2wgs84(x,y):
+    lon = x/20037508.34*180
+    lat = y/20037508.34*180
+    lat= 180/math.pi*(2*math.atan(math.exp(lat*math.pi/180))-math.pi/2)
+    return lon, lat
+
 """
 for saving shot point of viewfile
 """
@@ -451,5 +460,13 @@ def saveShotPointOfView(request):
         f.write('x: %s '%request.POST['x'])
         f.write('y: %s '%request.POST['y'])
         f.write('z: %s '%request.POST['z'])
+
+        mercatorX = request.POST['mx']
+        mercatorY = request.POST['my']
+        lon, lat = webMercator2wgs84(float(mercatorX), float(mercatorY))
+        f.write('latitude: %s '%lat)
+        f.write('longitude: %s '%lon)
+        f.write('altitude: %s '%request.POST['z'])
+
         f.write('\n')
     return Response({'success': True})
