@@ -1,4 +1,16 @@
 import proj4 from 'proj4';
+import * as ol from 'ol';
+import {LineString, Polygon, Point} from 'ol/geom';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
+import Tile from 'ol/layer/Tile';
+import OSM from 'ol/source/OSM';
+import {Text, Style, Circle, Stroke, Fill} from 'ol/style';
+import {defaults as defaultControls, Control} from 'ol/control';
+import MousePosition from 'ol/control/MousePosition';
+import {createStringXY} from 'ol/coordinate';
+import { DragBox, Select } from 'ol/interaction';
+import { platformModifierKeyOnly } from 'ol/events/condition';
 
 // http://epsg.io/
 proj4.defs('UTM10N', '+proj=utm +zone=10 +ellps=GRS80 +datum=NAD83 +units=m +no_defs');
@@ -22,26 +34,26 @@ export class MapView{
 
 		this.createAnnotationStyle = (text) => {
 			return [
-				new ol.style.Style({
-					image: new ol.style.Circle({
+				new Style({
+					image: new Circle({
 						radius: 10,
-						stroke: new ol.style.Stroke({
+						stroke: new Stroke({
 							color: [255, 255, 255, 0.5],
 							width: 2
 						}),
-						fill: new ol.style.Fill({
+						fill: new Fill({
 							color: [0, 0, 0, 0.5]
 						})
 					})
 				})/*,
-				new ol.style.Style({
-					text: new ol.style.Text({
+				new Style({
+					text: new Text({
 						font: '12px helvetica,sans-serif',
 						text: text,
-						fill: new ol.style.Fill({
+						fill: new Fill({
 							color: '#000'
 						}),
-						stroke: new ol.style.Stroke({
+						stroke: new Stroke({
 							color: '#fff',
 							width: 2
 						})
@@ -51,24 +63,24 @@ export class MapView{
 		};
 
 		this.createLabelStyle = (text) => {
-			let style = new ol.style.Style({
-				image: new ol.style.Circle({
+			let style = new Style({
+				image: new Circle({
 					radius: 6,
-					stroke: new ol.style.Stroke({
+					stroke: new Stroke({
 						color: 'white',
 						width: 2
 					}),
-					fill: new ol.style.Fill({
+					fill: new Fill({
 						color: 'green'
 					})
 				}),
-				text: new ol.style.Text({
+				text: new Text({
 					font: '12px helvetica,sans-serif',
 					text: text,
-					fill: new ol.style.Fill({
+					fill: new Fill({
 						color: '#000'
 					}),
-					stroke: new ol.style.Stroke({
+					stroke: new Stroke({
 						color: '#fff',
 						width: 2
 					})
@@ -99,8 +111,8 @@ export class MapView{
 		this.getSourcesLabelLayer();
 		this.getAnnotationsLayer();
 
-		let mousePositionControl = new ol.control.MousePosition({
-			coordinateFormat: ol.coordinate.createStringXY(5),
+		let mousePositionControl = new MousePosition({
+			coordinateFormat: createStringXY(5),
 			projection: 'EPSG:4326',
 			undefinedHTML: '&nbsp;'
 		});
@@ -177,15 +189,15 @@ export class MapView{
 			element.style.left = '0.5em';
 			element.title = 'Download file or list of selected tiles. Select tile with left mouse button or area using ctrl + left mouse.';
 
-			ol.control.Control.call(this, {
+			Control.call(this, {
 				element: element,
 				target: options.target
 			});
 		};
-		ol.inherits(DownloadSelectionControl, ol.control.Control);
+		ol.inherits(DownloadSelectionControl, Control);
 
 		this.map = new ol.Map({
-			controls: ol.control.defaults({
+			controls: defaultControls({
 				attributionOptions: ({
 					collapsible: false
 				})
@@ -195,7 +207,7 @@ export class MapView{
 				mousePositionControl
 			]),
 			layers: [
-				new ol.layer.Tile({source: new ol.source.OSM()}),
+				new Tile({source: new OSM()}),
 				this.toolLayer,
 				this.annotationsLayer,
 				this.sourcesLayer,
@@ -211,10 +223,10 @@ export class MapView{
 		});
 
 		// DRAGBOX / SELECTION
-		this.dragBoxLayer = new ol.layer.Vector({
-			source: new ol.source.Vector({}),
-			style: new ol.style.Style({
-				stroke: new ol.style.Stroke({
+		this.dragBoxLayer = new VectorLayer({
+			source: new VectorSource({}),
+			style: new Style({
+				stroke: new Stroke({
 					color: 'rgba(0, 0, 255, 1)',
 					width: 2
 				})
@@ -222,13 +234,13 @@ export class MapView{
 		});
 		this.map.addLayer(this.dragBoxLayer);
 
-		let select = new ol.interaction.Select();
+		let select = new Select();
 		this.map.addInteraction(select);
 
 		let selectedFeatures = select.getFeatures();
 
-		let dragBox = new ol.interaction.DragBox({
-			condition: ol.events.condition.platformModifierKeyOnly
+		let dragBox = new DragBox({
+			condition: platformModifierKeyOnly
 		});
 
 		this.map.addInteraction(dragBox);
@@ -295,7 +307,7 @@ export class MapView{
 			let position = annotation.position;
 			let mapPos = this.toMap.forward([position.x, position.y]);
 			let feature = new ol.Feature({
-				geometry: new ol.geom.Point(mapPos),
+				geometry: new Point(mapPos),
 				name: annotation.title
 			});
 			feature.setStyle(this.createAnnotationStyle(annotation.title));
@@ -349,26 +361,26 @@ export class MapView{
 			return this.extentsLayer;
 		}
 
-		this.gExtent = new ol.geom.LineString([[0, 0], [0, 0]]);
+		this.gExtent = new LineString([[0, 0], [0, 0]]);
 
 		let feature = new ol.Feature(this.gExtent);
-		let featureVector = new ol.source.Vector({
+		let featureVector = new VectorSource({
 			features: [feature]
 		});
 
-		this.extentsLayer = new ol.layer.Vector({
+		this.extentsLayer = new VectorLayer({
 			source: featureVector,
-			style: new ol.style.Style({
-				fill: new ol.style.Fill({
+			style: new Style({
+				fill: new Fill({
 					color: 'rgba(255, 255, 255, 0.2)'
 				}),
-				stroke: new ol.style.Stroke({
+				stroke: new Stroke({
 					color: '#0000ff',
 					width: 2
 				}),
-				image: new ol.style.Circle({
+				image: new Circle({
 					radius: 3,
-					fill: new ol.style.Fill({
+					fill: new Fill({
 						color: '#0000ff'
 					})
 				})
@@ -383,14 +395,14 @@ export class MapView{
 			return this.annotationsLayer;
 		}
 
-		this.annotationsLayer = new ol.layer.Vector({
-			source: new ol.source.Vector({
+		this.annotationsLayer = new VectorLayer({
+			source: new VectorSource({
 			}),
-			style: new ol.style.Style({
-				fill: new ol.style.Fill({
+			style: new Style({
+				fill: new Fill({
 					color: 'rgba(255, 0, 0, 1)'
 				}),
-				stroke: new ol.style.Stroke({
+				stroke: new Stroke({
 					color: 'rgba(255, 0, 0, 1)',
 					width: 2
 				})
@@ -406,16 +418,16 @@ export class MapView{
 		}
 
 		// CAMERA LAYER
-		this.gCamera = new ol.geom.LineString([[0, 0], [0, 0], [0, 0], [0, 0]]);
+		this.gCamera = new LineString([[0, 0], [0, 0], [0, 0], [0, 0]]);
 		let feature = new ol.Feature(this.gCamera);
-		let featureVector = new ol.source.Vector({
+		let featureVector = new VectorSource({
 			features: [feature]
 		});
 
-		this.cameraLayer = new ol.layer.Vector({
+		this.cameraLayer = new VectorLayer({
 			source: featureVector,
-			style: new ol.style.Style({
-				stroke: new ol.style.Stroke({
+			style: new Style({
+				stroke: new Stroke({
 					color: '#0000ff',
 					width: 2
 				})
@@ -430,14 +442,14 @@ export class MapView{
 			return this.toolLayer;
 		}
 
-		this.toolLayer = new ol.layer.Vector({
-			source: new ol.source.Vector({
+		this.toolLayer = new VectorLayer({
+			source: new VectorSource({
 			}),
-			style: new ol.style.Style({
-				fill: new ol.style.Fill({
+			style: new Style({
+				fill: new Fill({
 					color: 'rgba(255, 0, 0, 1)'
 				}),
-				stroke: new ol.style.Stroke({
+				stroke: new Stroke({
 					color: 'rgba(255, 0, 0, 1)',
 					width: 2
 				})
@@ -452,13 +464,13 @@ export class MapView{
 			return this.sourcesLayer;
 		}
 
-		this.sourcesLayer = new ol.layer.Vector({
-			source: new ol.source.Vector({}),
-			style: new ol.style.Style({
-				fill: new ol.style.Fill({
+		this.sourcesLayer = new VectorLayer({
+			source: new VectorSource({}),
+			style: new Style({
+				fill: new Fill({
 					color: 'rgba(0, 0, 150, 0.1)'
 				}),
-				stroke: new ol.style.Stroke({
+				stroke: new Stroke({
 					color: 'rgba(0, 0, 150, 1)',
 					width: 1
 				})
@@ -473,14 +485,14 @@ export class MapView{
 			return this.sourcesLabelLayer;
 		}
 
-		this.sourcesLabelLayer = new ol.layer.Vector({
-			source: new ol.source.Vector({
+		this.sourcesLabelLayer = new VectorLayer({
+			source: new VectorSource({
 			}),
-			style: new ol.style.Style({
-				fill: new ol.style.Fill({
+			style: new Style({
+				fill: new Fill({
 					color: 'rgba(255, 0, 0, 0.1)'
 				}),
-				stroke: new ol.style.Stroke({
+				stroke: new Stroke({
 					color: 'rgba(255, 0, 0, 1)',
 					width: 2
 				})
@@ -541,7 +553,7 @@ export class MapView{
 				coordinates.push(pointMap);
 			}
 
-			let line = new ol.geom.LineString(coordinates);
+			let line = new LineString(coordinates);
 			let feature = new ol.Feature(line);
 			this.toolLayer.getSource().addFeature(feature);
 		}
@@ -561,7 +573,7 @@ export class MapView{
 				coordinates.push(coordinates[0]);
 			}
 
-			let line = new ol.geom.LineString(coordinates);
+			let line = new LineString(coordinates);
 			let feature = new ol.Feature(line);
 			this.toolLayer.getSource().addFeature(feature);
 		}
@@ -640,17 +652,17 @@ export class MapView{
 				let p4 = this.toMap.forward([bounds.min[0], bounds.max[1]]);
 
 				// let feature = new ol.Feature({
-				//	'geometry': new ol.geom.LineString([p1, p2, p3, p4, p1])
+				//	'geometry': new LineString([p1, p2, p3, p4, p1])
 				// });
 				let feature = new ol.Feature({
-					'geometry': new ol.geom.Polygon([[p1, p2, p3, p4, p1]])
+					'geometry': new Polygon([[p1, p2, p3, p4, p1]])
 				});
 				feature.source = source;
 				feature.pointcloud = pointcloud;
 				this.getSourcesLayer().getSource().addFeature(feature);
 
 				feature = new ol.Feature({
-					geometry: new ol.geom.Point(mapCenter),
+					geometry: new Point(mapCenter),
 					name: name
 				});
 				feature.setStyle(this.createLabelStyle(name));

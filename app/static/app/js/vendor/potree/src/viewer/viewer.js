@@ -24,7 +24,7 @@ import {Scene} from "./Scene.js";
 import {ClippingTool} from "../utils/ClippingTool.js";
 import {TransformationTool} from "../utils/TransformationTool.js";
 import {Utils} from "../utils.js";
-// import {MapView} from "./map.js";
+import {MapView} from "./map.js";
 import {ProfileWindow, ProfileWindowController} from "./profile.js";
 import {BoxVolume} from "../utils/Volume.js";
 import {Features} from "../Features.js";
@@ -1014,8 +1014,8 @@ export class Viewer extends EventDispatcher{
 			viewer.renderArea.insertBefore(imgMapToggle, viewer.renderArea.children[0]);
 			viewer.renderArea.insertBefore(imgMenuToggle, viewer.renderArea.children[0]);
 
-			// this.mapView = new MapView(this);
-			// this.mapView.init();
+			this.mapView = new MapView(this);
+			this.mapView.init();
 
 			i18n.init({
 				lng: 'en',
