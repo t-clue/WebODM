@@ -200,13 +200,19 @@ class ModelView extends React.Component {
 
     var camera = window.viewer.scene.getActiveCamera();
     var position = camera.position;
+    var view = window.viewer.scene.view;
+
+    data.append('pitch', view.pitch);
+    data.append('yaw', view.yaw);
 
     data.append('x', position.x);
     data.append('y', position.y);
     data.append('z', position.z);
 
-    data.append('mx', window.viewer.mapView.mercatorX)
-    data.append('my', window.viewer.mapView.mercatorY)
+    data.append('mx', window.viewer.mapView.mercatorX);
+    data.append('my', window.viewer.mapView.mercatorY);
+    data.append('mapDirX', window.viewer.mapView.mapDir.x);
+    data.append('mapDirY', window.viewer.mapView.mapDir.y);
     request.send(data);
   }
 

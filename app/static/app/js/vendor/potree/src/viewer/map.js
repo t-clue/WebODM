@@ -32,8 +32,9 @@ export class MapView{
 		this.sourcesLabelLayer = null;
 		this.enabled = true;
 
-		this.mercatorX = 0 
-		this.mercatorY = 0
+		this.mercatorX = 0;
+		this.mercatorY = 0;
+		this.mapDir = null;
 
 		this.createAnnotationStyle = (text) => {
 			return [
@@ -718,6 +719,8 @@ export class MapView{
 
 		let mapLookAt = new THREE.Vector2().fromArray(this.toMap.forward([geoLookAt.x, geoLookAt.y]));
 		let mapDir = new THREE.Vector2().subVectors(mapLookAt, mapPos).normalize();
+
+		this.mapDir = mapDir
 
 		mapLookAt = mapPos.clone().add(mapDir.clone().multiplyScalar(30 * scale));
 		let mapLength = mapPos.distanceTo(mapLookAt);

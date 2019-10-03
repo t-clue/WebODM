@@ -451,15 +451,35 @@ def webMercator2wgs84(x,y):
     lat= 180/math.pi*(2*math.atan(math.exp(lat*math.pi/180))-math.pi/2)
     return lon, lat
 
+def azimuthAngle(x1, y1, x2, y2):
+    angle = 0.0;
+    dx = x2 - x1
+    dy = y2 - y1
+    if  x2 == x1:
+        angle = math.pi / 2.0
+        if  y2 == y1 :
+            angle = 0.0
+        elif y2 < y1 :
+            angle = 3.0 * math.pi / 2.0
+    elif x2 > x1 and y2 > y1:
+        angle = math.atan(dx / dy)
+    elif  x2 > x1 and  y2 < y1 :
+        angle = math.pi / 2 + math.atan(-dy / dx)
+    elif  x2 < x1 and y2 < y1 :
+        angle = math.pi + math.atan(dx / dy)
+    elif  x2 < x1 and y2 > y1 :
+        angle = 3.0 * math.pi / 2.0 + math.atan(dy / -dx)
+    return (angle * 180 / math.pi)
+
 """
 for saving shot point of viewfile
 """
 @csrf_exempt
 def saveShotPointOfView(request):
     with open(models.Setting.filename_pointOfView, 'a+') as f:
-        f.write('x: %s '%request.POST['x'])
-        f.write('y: %s '%request.POST['y'])
-        f.write('z: %s '%request.POST['z'])
+        # f.write('x: %s '%request.POST['x'])
+        # f.write('y: %s '%request.POST['y'])
+        # f.write('z: %s '%request.POST['z'])
 
         mercatorX = request.POST['mx']
         mercatorY = request.POST['my']
@@ -467,6 +487,14 @@ def saveShotPointOfView(request):
         f.write('latitude: %s '%lat)
         f.write('longitude: %s '%lon)
         f.write('altitude: %s '%request.POST['z'])
+
+        pitch = request.POST['pitch']
+        f.write('pitch: %s '%(math.degrees(float(pitch))))
+
+        mapDirX = request.POST['mapDirX']
+        mapDirY = request.POST['mapDirY']
+        yaw = azimuthAngle(0, 0, float(mapDirX), float(mapDirY))
+        f.write('yaw: %s '%(yaw))
 
         f.write('\n')
     return Response({'success': True})
